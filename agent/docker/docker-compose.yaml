@@ -25,7 +25,7 @@ services:
       MQTT_TOPIC: "agent_data_topic"
       DELAY: 0.1
     volumes:
-      - ../src/data:/app/src/data # Директорія data із тестовими значенням від датчиків
+      - ../src/data:/app/src/data # Data directory with test values ​​from sensors
     networks:
       mqtt_network:
 

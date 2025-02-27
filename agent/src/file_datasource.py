@@ -29,7 +29,6 @@ class FileDatasource:
     def _read_accelerometer_data(self) -> Accelerometer:
         if self.accelerometer_reader_ is not None:
             try:
-                
                 row = next(self.accelerometer_reader_, None)
                 if row:
                     x, y, z = map(int, row)
@@ -38,13 +37,13 @@ class FileDatasource:
                     raise StopIteration
             except StopIteration:
                 print(
-                    "Кінець файлу із даними для акселерометру, повертаємось до початку файлу")
+                    "End of file with data for accelerometer, going back to beginning of file")
                 self.accelerometer_file_.seek(0)
                 self.accelerometer_reader_ = reader(self.accelerometer_file_)
-                next(self.accelerometer_reader_, None)  # Пропускаємо заголовок
+                next(self.accelerometer_reader_, None)  # Skip the header
                 return self._read_accelerometer_data()
         else:
-            raise Exception("Читач не був ініціалізований")
+            raise Exception("The reader was not initialized")
 
     def _read_gps_data(self) -> Gps:
         if self.gps_reader_ is not None:
@@ -57,30 +56,30 @@ class FileDatasource:
                     raise StopIteration
             except StopIteration:
                 print(
-                    "Кінець файлу із даними для GPS, повертаємось до початку файлу")
+                    "End of file with data for GPS, going back to the beginning of the file")
                 self.gps_file_.seek(0)
                 self.gps_reader_ = reader(self.gps_file_)
-                next(self.gps_reader_, None)  # Пропускаємо заголовок
+                next(self.gps_reader_, None)  # Skip the header
                 return self._read_gps_data()
         else:
-            raise Exception("Читач не був ініціалізований")
+            raise Exception("The reader was not initialized")
 
-    def startReading(self, *args, **kwargs) -> None:
+    def start_reading(self, *args, **kwargs) -> None:
         """Метод повинен викликатись перед початком читання даних"""
         try:
             self.accelerometer_file_ = open(self.accelerometer_filename, 'r')
             self.gps_file_ = open(self.gps_filename, 'r')
             self.accelerometer_reader_ = reader(self.accelerometer_file_)
             self.gps_reader_ = reader(self.gps_file_)
-            # Пропускаємо перший рядок - заголовок
+            # Skip the first line - the header
             next(self.accelerometer_reader_, None)
             next(self.gps_reader_, None)
         except FileNotFoundError as error:
-            print(f"Файл не був знайдений: {error}")
+            print(f"The file was not found: {error}")
         except Exception as error:
             print(f"Error: {error}")
 
-    def stopReading(self, *args, **kwargs) -> None:
+    def stop_reading(self, *args, **kwargs) -> None:
         """Метод повинен викликатись для закінчення читання даних"""
         if self.accelerometer_file_:
             self.accelerometer_file_.close()

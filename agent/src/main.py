@@ -26,7 +26,7 @@ def connect_mqtt(broker, port):
 
 def publish(client, topic, datasource, delay):
     try:
-        datasource.startReading()
+        datasource.start_reading()
         while True:
             time.sleep(delay)
             data = datasource.read()
@@ -42,7 +42,7 @@ def publish(client, topic, datasource, delay):
     except Exception as error:
         print(f"{error}")
     finally:
-        datasource.stopReading()
+        datasource.stop_reading()
 
 
 def run():
