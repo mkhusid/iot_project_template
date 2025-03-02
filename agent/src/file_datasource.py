@@ -1,3 +1,8 @@
+'''
+This module is responsible for reading data from GPS and accelerometer files.
+TODO:  Refactor according to the SOLID principles and GoF design patterns.
+'''
+import typing
 from csv import reader
 from datetime import datetime
 from domain.accelerometer import Accelerometer
@@ -7,13 +12,35 @@ import config
 
 
 class FileDatasource:
+    '''
+    This class is responsible for reading data from GPS and accelerometer files.
+    
+    Example of usage:
+    acc_fname, gps_fname = 'agent/src/data/accelerometer.csv', 'agent/src/data/gps.csv'
+
+    with open(acc_fname, 'r', encoding='utf-8') as accelerometer_file,\
+            open(gps_fname, 'r', encoding='utf-8') as gps_file:
+        for i in range(100):
+            f_reader = FileDatasource(accelerometer_file, gps_file)
+            data = f_reader.read()
+'''
     def __init__(
         self,
-        accelerometer_filename: str,
-        gps_filename: str,
+        accelerometer_file_: typing.TextIO,
+        gps_file_: typing.TextIO,
     ) -> None:
-        self.accelerometer_filename = accelerometer_filename
-        self.gps_filename = gps_filename
+        self.accelerometer_file = accelerometer_file_
+        self.gps_file = gps_file_
+        try:
+            self.accelerometer_reader = reader(accelerometer_file_)
+            self.gps_reader = reader(gps_file_)
+            next(self.accelerometer_reader, None)
+            next(self.gps_reader, None)
+        except FileNotFoundError as error:
+            print(f"The file was not found: {error}")
+        except TypeError as error:
+            print(f"An error occurred: {error}")
+
 
     def read(self) -> AggregatedData:
         """Метод повертає дані отримані з датчиків"""
@@ -27,61 +54,38 @@ class FileDatasource:
         )
 
     def _read_accelerometer_data(self) -> Accelerometer:
-        if self.accelerometer_reader_ is not None:
-            try:
-                row = next(self.accelerometer_reader_, None)
-                if row:
-                    x, y, z = map(int, row)
-                    return Accelerometer(x, y, z)
-                else:
-                    raise StopIteration
-            except StopIteration:
-                print(
-                    "End of file with data for accelerometer, going back to beginning of file")
-                self.accelerometer_file_.seek(0)
-                self.accelerometer_reader_ = reader(self.accelerometer_file_)
-                next(self.accelerometer_reader_, None)  # Skip the header
-                return self._read_accelerometer_data()
-        else:
-            raise Exception("The reader was not initialized")
+        '''Метод повертає дані отримані з акселерометра'''
+        if self.accelerometer_reader is None:
+            raise TypeError("The reader was not initialized")
+        try:
+            row = next(self.accelerometer_reader, None)
+            if row is None:
+                raise StopIteration
+            x, y, z = map(int, row)
+            return Accelerometer(x, y, z)
+        except StopIteration:
+            print(
+                "End of file with data for accelerometer, going back to beginning of file")
+            self.accelerometer_file.seek(0)
+            self.accelerometer_reader = reader(self.accelerometer_file)
+            next(self.accelerometer_reader, None)  # Skip the header
+            return self._read_accelerometer_data()
 
     def _read_gps_data(self) -> Gps:
-        if self.gps_reader_ is not None:
-            try:
-                row = next(self.gps_reader_, None)
-                if row:
-                    longitude, latitude = map(float, row)
-                    return Gps(longitude, latitude)
-                else:
-                    raise StopIteration
-            except StopIteration:
-                print(
-                    "End of file with data for GPS, going back to the beginning of the file")
-                self.gps_file_.seek(0)
-                self.gps_reader_ = reader(self.gps_file_)
-                next(self.gps_reader_, None)  # Skip the header
-                return self._read_gps_data()
-        else:
-            raise Exception("The reader was not initialized")
-
-    def start_reading(self, *args, **kwargs) -> None:
-        """Метод повинен викликатись перед початком читання даних"""
+        '''Метод повертає дані отримані з GPS'''
+        if self.gps_reader is None:
+            raise TypeError("The reader was not initialized")
         try:
-            self.accelerometer_file_ = open(self.accelerometer_filename, 'r')
-            self.gps_file_ = open(self.gps_filename, 'r')
-            self.accelerometer_reader_ = reader(self.accelerometer_file_)
-            self.gps_reader_ = reader(self.gps_file_)
-            # Skip the first line - the header
-            next(self.accelerometer_reader_, None)
-            next(self.gps_reader_, None)
-        except FileNotFoundError as error:
-            print(f"The file was not found: {error}")
-        except Exception as error:
-            print(f"Error: {error}")
+            row = next(self.gps_reader, None)
+            if row is None:
+                raise StopIteration
+            longitude, latitude = map(float, row)
 
-    def stop_reading(self, *args, **kwargs) -> None:
-        """Метод повинен викликатись для закінчення читання даних"""
-        if self.accelerometer_file_:
-            self.accelerometer_file_.close()
-        if self.gps_file_:
-            self.gps_file_.close()
+            return Gps(longitude, latitude)
+        except StopIteration:
+            print(
+                "End of file with data for GPS, going back to the beginning of the file")
+            self.gps_file.seek(0)
+            self.gps_reader = reader(self.gps_file)
+            next(self.gps_reader, None)  # Skip the header
+            return self._read_gps_data()
