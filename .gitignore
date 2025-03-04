@@ -1,0 +1,4 @@
+
+agent/docker/mosquitto/data/mosquitto.db
+
+agent/docker/mosquitto/log/mosquitto.log

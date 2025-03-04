@@ -1,2 +1,5 @@
 venv
 __pycache__
+
+agent/docker/mosquitto/data
+agent/docker/mosquitto/log

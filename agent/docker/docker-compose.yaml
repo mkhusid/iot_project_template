@@ -14,7 +14,6 @@ services:
     networks:
       mqtt_network:
 
-
   fake_agent:
     container_name: agent
     build: ../
@@ -25,9 +24,10 @@ services:
       MQTT_BROKER_PORT: 1883
       MQTT_TOPIC: "agent_data_topic"
       DELAY: 0.1
+    volumes:
+      - ../src/data:/app/src/data # Data directory with test values ​​from sensors
     networks:
       mqtt_network:
-
 
 networks:
   mqtt_network:
