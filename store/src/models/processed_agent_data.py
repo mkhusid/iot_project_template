@@ -15,4 +15,4 @@ class ProcessedAgentData(BaseModel):
     z = Column(Float)
     latitude = Column(Float)
     longitude = Column(Float)
-    timestamp = Column(DateTime, default=datetime.now())
+    timestamp = Column(DateTime, default=datetime.now)
