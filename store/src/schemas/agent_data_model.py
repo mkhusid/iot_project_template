@@ -21,21 +21,7 @@ class AgentDataModel(BaseModel):
     user_id: int
     accelerometer: AccelerometerDataModel
     gps: GpsDataModel
-    timestamp: datetime
-
-    @classmethod
-    @field_validator("timestamp", mode="before")
-    def check_timestamp(cls, value):
-        ''' Validate the timestamp format. '''
-        if isinstance(value, datetime):
-            return value
-        try:
-            return datetime.fromisoformat(value)
-        except (TypeError, ValueError) as e:
-            raise ValueError(
-                "Invalid timestamp format. Expected ISO 8601 format (YYYY-MM-DDTHH:MM:SSZ)."
-            ) from e
-
+ 
 
 class ProcessedAgentDataModel(BaseModel):
     ''' Processed agent data model. '''

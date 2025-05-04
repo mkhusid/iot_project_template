@@ -1,8 +1,9 @@
 from sqlalchemy import Column, Integer, String, Float, DateTime
-from src.database.core import Base
+from src.database.core import BaseModel
+from datetime import datetime
 
 
-class ProcessedAgentData(Base):
+class ProcessedAgentData(BaseModel):
     ''' SQLAlchemy model for processed agent data. '''
     __tablename__ = "processed_agent_data"
 
@@ -14,4 +15,4 @@ class ProcessedAgentData(Base):
     z = Column(Float)
     latitude = Column(Float)
     longitude = Column(Float)
-    timestamp = Column(DateTime)
+    timestamp = Column(DateTime, default=datetime.now())
