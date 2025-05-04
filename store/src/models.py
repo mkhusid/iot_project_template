@@ -1,38 +1,43 @@
+''' Pydantic models for store agent data API. '''
 from datetime import datetime
 from pydantic import field_validator, BaseModel
 
 
-# FastAPI models
-class AccelerometerData(BaseModel):
+class AccelerometerDataModel(BaseModel):
+    ''' Accelerometer data model. '''
     x: float
     y: float
     z: float
 
 
-class GpsData(BaseModel):
+class GpsDataModel(BaseModel):
+    ''' GPS data model. '''
     latitude: float
     longitude: float
 
 
-class AgentData(BaseModel):
+class AgentDataModel(BaseModel):
+    ''' Agent data model. '''
     user_id: int
-    accelerometer: AccelerometerData
-    gps: GpsData
+    accelerometer: AccelerometerDataModel
+    gps: GpsDataModel
     timestamp: datetime
 
     @classmethod
     @field_validator("timestamp", mode="before")
     def check_timestamp(cls, value):
+        ''' Validate the timestamp format. '''
         if isinstance(value, datetime):
             return value
         try:
             return datetime.fromisoformat(value)
-        except (TypeError, ValueError):
+        except (TypeError, ValueError) as e:
             raise ValueError(
                 "Invalid timestamp format. Expected ISO 8601 format (YYYY-MM-DDTHH:MM:SSZ)."
-            )
+            ) from e
 
 
-class ProcessedAgentData(BaseModel):
+class ProcessedAgentDataModel(BaseModel):
+    ''' Processed agent data model. '''
     road_state: str
-    agent_data: AgentData
+    agent_data: AgentDataModel
