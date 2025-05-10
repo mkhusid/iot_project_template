@@ -26,7 +26,7 @@ class AgentMQTTAdapter(AgentGateway):
 
     def on_connect(self, client, userdata, flags, rc):
         if rc == 0:
-            logging.info("Connected to MQTT broker")
+            logging.info(f"Connected to MQTT broker. Topic: {self.topic}")
             self.client.subscribe(self.topic)
         else:
             logging.info(f"Failed to connect to MQTT broker with code: {rc}")
@@ -34,6 +34,7 @@ class AgentMQTTAdapter(AgentGateway):
     def on_message(self, client, userdata, msg):
         """Processing agent data and sent it to hub gateway"""
         try:
+            print("Received raw agent data from MQTT")
             payload: str = msg.payload.decode("utf-8")
             # Create AgentData instance with the received data
             agent_data = AgentData.model_validate_json(payload, strict=True)

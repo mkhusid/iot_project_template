@@ -1,7 +1,6 @@
 import logging
 
-import requests as requests
-
+import requests
 from app.entities.processed_agent_data import ProcessedAgentData
 from app.interfaces.hub_gateway import HubGateway
 
