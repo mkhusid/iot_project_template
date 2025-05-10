@@ -30,42 +30,42 @@ def connect_mqtt(broker, port):
     return client
 
 
-def publish(client, topic, gps_file, accerelometer_file, delay):
+def publish(client, topic, datasource, delay):
+    """Publish data to MQTT broker"""
+    data = datasource.read()
+    print(f"Data: {data}")
+    gps = GpsSchema(latitude=data.gps.latitude, longitude=data.gps.longitude)
+    acc = AccelerometerSchema(
+        x=data.accelerometer.x,
+        y=data.accelerometer.y,
+        z=data.accelerometer.z)
+    msg = AggregatedDataSchema(accelerometer=acc,
+                                gps=gps,
+                                timestamp=str(data.timestamp),
+                                user_id=str(data.user_id)).model_dump_json()
+    result = client.publish(topic, msg)
+    status = result[0]
+
+    if status == 0:
+        print(f"Send `{msg}` to topic `{topic}`")
+    else:
+        print(f"Failed to send message to topic {topic}")
+
+    time.sleep(delay)
+
+
+
+def run():
+    '''Main function to run the MQTT client and publish data in infinity loop'''
+    client = connect_mqtt(config.MQTT_BROKER_HOST, config.MQTT_BROKER_PORT)
+    accerelometer_file = './src/data/accelerometer.csv'
+    gps_file = './src/data/gps.csv'
 
     with open(gps_file, 'r', encoding='utf-8') as gps_file,\
             open(accerelometer_file, 'r', encoding='utf-8') as accerelometer_file:
         while True:
             datasource = FileDatasource(accerelometer_file, gps_file)
-            time.sleep(delay)
-            data = datasource.read()
-            print(f"Data: {data}")
-            gps = GpsSchema(latitude=data.gps.latitude, longitude=data.gps.longitude)
-            acc = AccelerometerSchema(
-                x=data.accelerometer.x,
-                y=data.accelerometer.y,
-                z=data.accelerometer.z)
-            msg = AggregatedDataSchema(accelerometer=acc,
-                                       gps=gps,
-                                       timestamp=str(data.timestamp),
-                                       user_id=str(data.user_id)).model_dump_json()
-            result = client.publish(topic, msg)
-            # result: [0, 1]
-            status = result[0]
-            if status == 0:
-                # pass
-                print(f"Send `{msg}` to topic `{topic}`")
-            else:
-                print(f"Failed to send message to topic {topic}")
-
-
-def run():
-    '''Main function to run the MQTT client and publish data'''
-    client = connect_mqtt(config.MQTT_BROKER_HOST, config.MQTT_BROKER_PORT)
-    accerelometer_file = './src/data/accelerometer.csv'
-    gps_file = './src/data/gps.csv'
-
-    # Infinity publish data
-    publish(client, config.MQTT_TOPIC, gps_file, accerelometer_file, delay=config.DELAY)
+            publish(client, config.MQTT_TOPIC, datasource, delay=config.DELAY)
 
 if __name__ == "__main__":
     run()
