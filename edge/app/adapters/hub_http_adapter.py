@@ -1,12 +1,16 @@
+""" Hub HTTP Adapter """
 import logging
-
-import requests as requests
-
+import requests
 from app.entities.processed_agent_data import ProcessedAgentData
 from app.interfaces.hub_gateway import HubGateway
 
 
 class HubHttpAdapter(HubGateway):
+    """
+    HubHttpAdapter is an adapter for sending processed agent data to a Hub via HTTP.
+    It implements the HubGateway interface.
+    It uses the requests library to send HTTP POST requests to the Hub API.
+    """
     def __init__(self, api_base_url):
         self.api_base_url = api_base_url
 
@@ -23,7 +27,9 @@ class HubHttpAdapter(HubGateway):
         response = requests.post(url, data=processed_data.model_dump_json())
         if response.status_code != 200:
             logging.info(
-                f"Invalid Hub response\nData: {processed_data.model_dump_json()}\nResponse: {response}"
+                "Invalid Hub response\nData: %s\nResponse: %s",
+                processed_data.model_dump_json(),
+                response,
             )
             return False
         return True
