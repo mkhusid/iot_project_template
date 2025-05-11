@@ -8,4 +8,4 @@ class AggregatedDataSchema(BaseModel):
     accelerometer: AccelerometerSchema
     gps: GpsSchema
     timestamp: str
-    user_id: str
+    user_id: int

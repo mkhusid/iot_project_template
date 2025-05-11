@@ -1,4 +1,3 @@
-from datetime import datetime
 import paho.mqtt.client as mqtt
 import time
 from schema.aggregated_data_schema import AggregatedDataSchema
@@ -42,7 +41,7 @@ def publish(client, topic, datasource, delay):
     msg = AggregatedDataSchema(accelerometer=acc,
                                 gps=gps,
                                 timestamp=str(data.timestamp),
-                                user_id=str(data.user_id)).model_dump_json()
+                                user_id=int(data.user_id)).model_dump_json()
     result = client.publish(topic, msg)
     status = result[0]
 

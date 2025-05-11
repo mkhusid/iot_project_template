@@ -79,9 +79,9 @@ class FileDatasource:
             row = next(self.gps_reader, None)
             if row is None:
                 raise StopIteration
-            longitude, latitude = map(float, row)
+            latitude, longitude = map(float, row)
 
-            return Gps(longitude, latitude)
+            return Gps(latitude, longitude)
         except StopIteration:
             print(
                 "End of file with data for GPS, going back to the beginning of the file")
