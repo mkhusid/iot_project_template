@@ -23,22 +23,24 @@ class StoreApiAdapter(StoreGateway):
         """
         try:
             # Convert the list of ProcessedAgentData to a list of dictionaries
-            data_to_save = [data.dict() for data in processed_agent_data_batch]
+            data_to_save = [data.model_dump(mode="json") for data in processed_agent_data_batch]
+
             # Send a POST request to the Store API
             response = requests.post(
-                f"{self.api_base_url}/processed_agent_data/",
+                f"{self.api_base_url}/road-data/",
                 headers={"Content-Type": "application/json"},
                 data=json.dumps(data_to_save),
             )
             # Check if the request was successful
             if response.status_code == 200:
+                logging.info("Data saved successfully to Store API")
                 return True
             else:
-                logging.error(f"Failed to save data: {response.status_code} - {response.text}")
+                logging.error("Failed to save data: %s - %s", response.status_code, response.text)
                 return False
         except pydantic_core.ValidationError as e:
-            logging.error(f"Validation error: {e}")
+            logging.error("Validation error: %s", e)
             return False
         except Exception as e:
-            logging.error(f"An error occurred: {e}")
+            logging.error("An error occurred: %s", e)
             return False
