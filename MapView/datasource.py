@@ -70,7 +70,6 @@ class Datasource:
 
     def handle_received_data(self, data):
         # Update your UI or perform actions with received data here
-        parsed_data = data
         parsed_items = [json.loads(item) for item in json.loads(data)]
         Logger.info(f"Received data: {parsed_items}")
         sorted_data = sorted(

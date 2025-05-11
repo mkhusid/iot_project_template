@@ -8,7 +8,7 @@ import uvicorn
 
 # FastAPI app setup
 app = FastAPI()
-app.include_router(store_router, prefix='/store')
+app.include_router(store_router, prefix='/store', tags=['iot-store'])
 
 
 @app.websocket("/ws")

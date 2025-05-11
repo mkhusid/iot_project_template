@@ -1,4 +1,5 @@
-from datetime import datetime
+# type: ignore
+''' Store processed agent data and manage CRUD operations. '''
 import logging
 from typing import List
 from fastapi import APIRouter
@@ -11,8 +12,9 @@ import src.utils.socket as socket
 store_router = APIRouter()
 
 
-@store_router.post("/")
-async def create_processed_agent_data(data: List[ProcessedAgentDataModel], session: db_session):
+@store_router.post("/road-data")
+async def create_agent_data(data: List[ProcessedAgentDataModel], session: db_session):
+    ''' Store processed agent data. '''
     processed_agent_data = [ProcessedAgentData(
         road_state=a_data.road_state,
         user_id=a_data.agent_data.user_id,
@@ -37,23 +39,27 @@ async def create_processed_agent_data(data: List[ProcessedAgentDataModel], sessi
         return {"message": "Error sending data to subscribers"}
 
 
-@store_router.get("/{processed_agent_data_id}")
-async def read_processed_agent_data(processed_agent_data_id: int, session: db_session):
+@store_router.get("/road-data/{processed_data_id}")
+async def read_agent_data(processed_data_id: int, session: db_session):
+    '''Get processed agent data by ID.'''
     async with session:
-        result = await ProcessedAgentData.select(session, id=processed_agent_data_id)
+        result = await ProcessedAgentData.select(session, id=processed_data_id)
         return result[0] if result else {"message": "Instance not found"}
 
 
-@store_router.get("/")
-async def list_processed_agent_data(session: db_session):
+@store_router.get("/road-data")
+async def list_agent_data(session: db_session):
+    '''List all processed agent data.'''
     async with session:
         return await ProcessedAgentData.select(session)
 
 
-@store_router.put("/{processed_agent_data_id}")
-async def update_processed_agent_data(processed_agent_data_id: int, data: ProcessedAgentDataModel, session: db_session):
+@store_router.put("/road-data/{processed_data_id}")
+async def update_agent_data(processed_data_id: int,
+                            data: ProcessedAgentDataModel, session: db_session):
+    '''Update processed agent data by ID.'''
     async with session:
-        result = await ProcessedAgentData.select(session, id=processed_agent_data_id)
+        result = await ProcessedAgentData.select(session, id=processed_data_id)
         instance = result[0] if result else None
         if not instance:
             return {"message": "Instance not found"}
@@ -70,10 +76,11 @@ async def update_processed_agent_data(processed_agent_data_id: int, data: Proces
         return instance
 
 
-@store_router.delete("/{processed_agent_data_id}")
-async def delete_processed_agent_data(processed_agent_data_id: int, session: db_session):
+@store_router.delete("/road-data/{processed_data_id}")
+async def delete_agent_data(processed_data_id: int, session: db_session):
+    ''' Delete a processed agent data instance by ID. '''
     async with session:
-        result = await ProcessedAgentData.select(session, id=processed_agent_data_id)
+        result = await ProcessedAgentData.select(session, id=processed_data_id)
         instance = result[0] if result else None
         if not instance:
             return {"message": "Instance not found"}
@@ -83,8 +90,9 @@ async def delete_processed_agent_data(processed_agent_data_id: int, session: db_
         return {"message": "Deleted successfully"}
 
 
-@store_router.delete("/")
+@store_router.delete("/road-data")
 async def clear_all_data(session: db_session):
+    ''' Clear all processed agent data. '''
     async with session:
         instances = await ProcessedAgentData.select(session)
         for instance in instances:
