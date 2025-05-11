@@ -1,13 +1,15 @@
+""" Hub MQTT Adapter """
 import logging
-
-import requests as requests
 from paho.mqtt import client as mqtt_client
-
 from app.entities.processed_agent_data import ProcessedAgentData
 from app.interfaces.hub_gateway import HubGateway
 
 
 class HubMqttAdapter(HubGateway):
+    """
+    HubMqttAdapter is an adapter for sending processed agent data to a Hub via MQTT.
+    It implements the HubGateway interface.
+    """
     def __init__(self, broker, port, topic):
         self.broker = broker
         self.port = port
@@ -28,19 +30,20 @@ class HubMqttAdapter(HubGateway):
         if status == 0:
             return True
         else:
-            print(f"Failed to send message to topic {self.topic}")
+            logging.info("Failed to send message to topic %s", self.topic)
             return False
 
     @staticmethod
     def _connect_mqtt(broker, port):
         """Create MQTT client"""
-        print(f"CONNECT TO {broker}:{port}")
+        logging.info("CONNECT TO %s:%s", broker, port)
 
         def on_connect(client, userdata, flags, rc):
             if rc == 0:
-                print(f"Connected to MQTT Broker ({broker}:{port})!")
+                logging.info("Connected to MQTT Broker (%s:%s)!", broker, port)
+                logging.info("Details: %s, %s, %s, %s", client, userdata, flags, rc)
             else:
-                print("Failed to connect {broker}:{port}, return code %d\n", rc)
+                logging.info("Failed to connect {broker}:{port}, return code %d\n", rc)
                 exit(rc)  # Stop execution
 
         client = mqtt_client.Client()

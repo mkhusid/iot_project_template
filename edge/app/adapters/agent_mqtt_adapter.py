@@ -1,12 +1,16 @@
+""" Agent MQTT Adapter """
 import logging
 import paho.mqtt.client as mqtt
 from app.interfaces.agent_gateway import AgentGateway
-from app.entities.agent_data import AgentData, GpsData
+from app.entities.agent_data import AgentData
 from app.usecases.data_processing import process_agent_data
 from app.interfaces.hub_gateway import HubGateway
 
-
 class AgentMQTTAdapter(AgentGateway):
+    """ AgentMQTTAdapter is an adapter for receiving agent data from an MQTT broker.
+    It implements the AgentGateway interface.
+    It processes the received data and sends it to a Hub via a HubGateway.
+    """
     def __init__(
         self,
         broker_host,
@@ -25,15 +29,18 @@ class AgentMQTTAdapter(AgentGateway):
         self.hub_gateway = hub_gateway
 
     def on_connect(self, client, userdata, flags, rc):
+        """Callback for when the client receives a CONNACK response from the server."""
         if rc == 0:
-            logging.info("Connected to MQTT broker")
+            logging.info("Connected to MQTT broker. Topic: %s", self.topic)
+            logging.info("Details: %s, %s, %s, %s", client, userdata, flags, rc)
             self.client.subscribe(self.topic)
         else:
-            logging.info(f"Failed to connect to MQTT broker with code: {rc}")
+            logging.info("Failed to connect to MQTT broker with code: %s", rc)
 
     def on_message(self, client, userdata, msg):
         """Processing agent data and sent it to hub gateway"""
         try:
+            print("Received raw agent data from MQTT")
             payload: str = msg.payload.decode("utf-8")
             # Create AgentData instance with the received data
             agent_data = AgentData.model_validate_json(payload, strict=True)
@@ -55,22 +62,3 @@ class AgentMQTTAdapter(AgentGateway):
 
     def stop(self):
         self.client.loop_stop()
-
-
-# Usage example:
-if __name__ == "__main__":
-    broker_host = "localhost"
-    broker_port = 1883
-    topic = "agent_data_topic"
-    # Assuming you have implemented the StoreGateway and passed it to the adapter
-    store_gateway = HubGateway()
-    adapter = AgentMQTTAdapter(broker_host, broker_port, topic, store_gateway)
-    adapter.connect()
-    adapter.start()
-    try:
-        # Keep the adapter running in the background
-        while True:
-            pass
-    except KeyboardInterrupt:
-        adapter.stop()
-        logging.info("Adapter stopped.")

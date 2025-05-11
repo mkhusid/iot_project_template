@@ -1,6 +1,7 @@
-from marshmallow import Schema, fields
+from pydantic import BaseModel
 
 
-class GpsSchema(Schema):
-    longitude = fields.Number()
-    latitude = fields.Number()
+class GpsSchema(BaseModel):
+    ''' GPS data schema. '''
+    latitude: float
+    longitude: float

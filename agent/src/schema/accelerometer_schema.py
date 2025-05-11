@@ -1,7 +1,7 @@
-from marshmallow import Schema, fields
+from pydantic import BaseModel
 
-
-class AccelerometerSchema(Schema):
-    x = fields.Int()
-    y = fields.Int()
-    z = fields.Int()
+class AccelerometerSchema(BaseModel):
+    ''' Accelerometer data schema. '''
+    x: float
+    y: float
+    z: float

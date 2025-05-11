@@ -16,25 +16,21 @@ class AgentGateway(ABC):
             userdata: Any additional user data passed to the MQTT client.
             msg: The MQTT message received from the agent.
         """
-        pass
 
     @abstractmethod
     def connect(self):
         """
         Method to establish a connection to the agent.
         """
-        pass
 
     @abstractmethod
     def start(self):
         """
         Method to start listening for messages from the agent.
         """
-        pass
 
     @abstractmethod
     def stop(self):
         """
         Method to stop the agent gateway and clean up resources.
         """
-        pass

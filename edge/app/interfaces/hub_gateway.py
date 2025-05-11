@@ -17,4 +17,3 @@ class HubGateway(ABC):
         Returns:
             bool: True if the data is successfully saved, False otherwise.
         """
-        pass
