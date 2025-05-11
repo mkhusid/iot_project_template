@@ -1,6 +1,7 @@
 import json
 import logging
 from typing import List
+from datetime import datetime
 
 import pydantic_core
 import requests
@@ -22,20 +23,17 @@ class StoreApiAdapter(StoreGateway):
             bool: True if the data is successfully saved, False otherwise.
         """
         try:
-            # Convert the list of ProcessedAgentData to a list of dictionaries
-            data_to_save = [data.dict() for data in processed_agent_data_batch]
-            # Send a POST request to the Store API
-            response = requests.post(
-                f"{self.api_base_url}/processed_agent_data/",
-                headers={"Content-Type": "application/json"},
-                data=json.dumps(data_to_save),
-            )
-            # Check if the request was successful
-            if response.status_code == 200:
+            # Validate the processed agent data batch
+            sent_data = [processed_agent_data.serialize() for processed_agent_data in processed_agent_data_batch]
+            response = requests.post(self.api_base_url + "/store/",
+                                     data=json.dumps(sent_data))
+
+            if response.ok:
+                logging.info(f"Data saved successfully: {response.status_code}")
                 return True
-            else:
-                logging.error(f"Failed to save data: {response.status_code} - {response.text}")
-                return False
+            logging.error(f"Failed to save data: {response.status_code} - {response.text}")
+            return False
+
         except pydantic_core.ValidationError as e:
             logging.error(f"Validation error: {e}")
             return False

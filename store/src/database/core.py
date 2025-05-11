@@ -5,6 +5,9 @@ from sqlalchemy.orm import sessionmaker, declarative_base
 from sqlalchemy.future import select
 from config import DATABASE_URL
 
+# Example:
+DATABASE_URL = "postgresql+asyncpg://user:pass@postgres_db:5432/test_db"
+
 Base = declarative_base()
 
 class BaseModel(Base):
@@ -28,5 +31,5 @@ async def get_db() -> AsyncSession:
         yield db
     finally:
         await db.close()
-      
+
 db_session = Annotated[AsyncSession, Depends(get_db)]

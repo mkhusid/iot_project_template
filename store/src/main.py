@@ -3,6 +3,7 @@ It sets up the FastAPI app, includes the router, and defines the WebSocket endpo
 from fastapi import FastAPI, WebSocket
 from src.router import store_router
 import src.utils.socket as socket
+import uvicorn
 
 # FastAPI app setup
 app = FastAPI()
@@ -15,6 +16,4 @@ async def open_ws(websocket: WebSocket):
 
 
 if __name__ == "__main__":
-    import uvicorn
-
-    uvicorn.run(app, host="127.0.0.1", port=8000)
+    uvicorn.run(app, host="0.0.0.0", port=8000)

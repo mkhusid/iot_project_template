@@ -1,11 +1,15 @@
-# Use the official Python image as the base image
-FROM python:3.9-slim
-# Set the working directory inside the container
+# File: hub/Dockerfile
+FROM python:3.10.0-slim-bullseye
+# Upgrade system packages and pip
+RUN apt-get update && apt-get install -y --no-install-recommends gcc \
+    && pip install --upgrade pip
+# Set the working directory
 WORKDIR /app
-# Copy the requirements.txt file and install dependencies
+# Copy requirements file first to leverage docker cache
 COPY requirements.txt .
+# Install dependencies
 RUN pip install --no-cache-dir -r requirements.txt
-# Copy the entire application into the container
+# Copy the rest of the code
 COPY . .
-# Run the main.py script inside the container when it starts
-CMD ["uvicorn", "main:app", "--host", "0.0.0.0"]
+# Expose the port and set the command
+CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "9000"]

@@ -30,7 +30,7 @@ services:
     ports:
       - "5050:80"
     networks:
-      db_network:
+      db_network:1
 
 
   store:

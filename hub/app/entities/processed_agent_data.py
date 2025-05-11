@@ -20,6 +20,6 @@ class ProcessedAgentData(BaseModel):
                     "latitude": self.agent_data.gps.latitude,
                     "longitude": self.agent_data.gps.longitude
                 },
-                "timestamp": self.agent_data.timestamp,
+                "timestamp": str(self.agent_data.timestamp),
             }
         }
