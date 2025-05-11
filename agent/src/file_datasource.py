@@ -12,9 +12,9 @@ import config
 
 
 class FileDatasource:
-    '''
+    """
     This class is responsible for reading data from GPS and accelerometer files.
-    
+
     Example of usage:
     acc_fname, gps_fname = 'agent/src/data/accelerometer.csv', 'agent/src/data/gps.csv'
 
@@ -23,7 +23,7 @@ class FileDatasource:
         for i in range(100):
             f_reader = FileDatasource(accelerometer_file, gps_file)
             data = f_reader.read()
-'''
+"""
     def __init__(
         self,
         accelerometer_file_: typing.TextIO,
