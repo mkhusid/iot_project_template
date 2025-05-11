@@ -14,6 +14,7 @@ class GpsData(BaseModel):
 
 
 class AgentData(BaseModel):
+    user_id: int
     accelerometer: AccelerometerData
     gps: GpsData
     timestamp: datetime
@@ -21,12 +22,12 @@ class AgentData(BaseModel):
     @classmethod
     @field_validator("timestamp", mode="before")
     def parse_timestamp(cls, value):
-        # Convert the timestamp to a datetime object
+        """Parse the timestamp to a datetime object."""
         if isinstance(value, datetime):
             return value
         try:
             return datetime.fromisoformat(value)
-        except (TypeError, ValueError):
+        except (TypeError, ValueError) as err:
             raise ValueError(
                 "Invalid timestamp format. Expected ISO 8601 format (YYYY-MM-DDTHH:MM:SSZ)."
-            )
+            ) from err
