@@ -4,8 +4,8 @@ import asyncio
 import json
 
 
-# WebSocket subscriptions
-subscriptions: Set[WebSocket] = set()
+# WebSocket subscribers
+subscribers: Set[WebSocket] = set()
 
 
 async def open_websocket(websocket: WebSocket):
@@ -14,13 +14,15 @@ async def open_websocket(websocket: WebSocket):
         websocket (WebSocket): The WebSocket connection.
         user_id (int): The user ID to subscribe to.
     '''
+    print("WebSocket connection opened")
     await websocket.accept()
-    subscriptions.add(websocket)
+    subscribers.add(websocket)
     try:
         while True:
-            await websocket.receive_text()
+            data = await websocket.receive_text()
+            print(data)
     except WebSocketDisconnect:
-        subscriptions.remove(websocket)
+        subscribers.remove(websocket)
 
 
 async def send_data(data):
@@ -28,8 +30,11 @@ async def send_data(data):
     Args:
         data (dict): The data to send.
     '''
+    if len(subscribers) == 0:
+        raise ValueError("No subscribers connected")
+
     messages = []
-    for websocket in subscriptions:
+    for websocket in subscribers:
         task = websocket.send_json(json.dumps(data))
         messages.append(task)
     async with asyncio.TaskGroup() as tg:

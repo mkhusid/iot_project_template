@@ -1,3 +1,5 @@
+from datetime import datetime
+import logging
 from typing import List
 from fastapi import APIRouter
 from src.schemas.agent_data_model import ProcessedAgentDataModel
@@ -19,17 +21,20 @@ async def create_processed_agent_data(data: List[ProcessedAgentDataModel], sessi
         z=a_data.agent_data.accelerometer.z,
         latitude=a_data.agent_data.gps.latitude,
         longitude=a_data.agent_data.gps.longitude,
+        timestamp=a_data.agent_data.timestamp
     ) for a_data in data]
     session.add_all(processed_agent_data)
 
     try:
-        await socket.send_data(data)
+        json_data = [pa_data.model_dump_json() for pa_data in data]
+        await socket.send_data(json_data)
         await session.commit()
         return [{"id": data.id, "timestamp": data.timestamp} for data in processed_agent_data]
 
     except Exception as e:
         await session.rollback()
-        print(f"Error sending data to subscribers: {e}")
+        logging.error("Error sending data to subscribers: %s", e)
+        return {"message": "Error sending data to subscribers"}
 
 
 @store_router.get("/{processed_agent_data_id}")
