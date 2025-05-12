@@ -11,10 +11,10 @@ app = FastAPI()
 app.include_router(store_router, prefix='/store', tags=['iot-store'])
 
 
-@app.websocket("/ws")
-async def open_ws(websocket: WebSocket):
+@app.websocket("/ws/{user_id}")
+async def open_ws(websocket: WebSocket, user_id: int):
     ''' WebSocket endpoint for handling incoming WebSocket connections. '''
-    await socket.open_websocket(websocket)
+    await socket.open_websocket(websocket, user_id)
 
 
 if __name__ == "__main__":

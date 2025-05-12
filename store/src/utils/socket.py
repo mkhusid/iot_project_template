@@ -1,14 +1,14 @@
-from typing import Set
+from typing import Dict, Set
 from fastapi import WebSocket, WebSocketDisconnect
 import asyncio
 import json
 
 
 # WebSocket subscribers
-subscribers: Set[WebSocket] = set()
+subscribers: Dict[int, Set[WebSocket]] = {}
 
 
-async def open_websocket(websocket: WebSocket):
+async def open_websocket(websocket: WebSocket, user_id: int):
     '''WebSocket endpoint for subscribing to user data.
     Args:
         websocket (WebSocket): The WebSocket connection.
@@ -16,16 +16,17 @@ async def open_websocket(websocket: WebSocket):
     '''
     print("WebSocket connection opened")
     await websocket.accept()
-    subscribers.add(websocket)
+    if user_id not in subscribers:
+        subscribers[user_id] = set()
+    subscribers[user_id].add(websocket)
     try:
         while True:
-            data = await websocket.receive_text()
-            print(data)
+            await websocket.receive_text()
     except WebSocketDisconnect:
-        subscribers.remove(websocket)
+        subscribers[user_id].remove(websocket)
 
 
-async def send_data(data):
+async def send_data(data, user_id: int):
     '''Send data to all subscribers.
     Args:
         data (dict): The data to send.
@@ -34,7 +35,7 @@ async def send_data(data):
         raise ValueError("No subscribers connected")
 
     messages = []
-    for websocket in subscribers:
+    for websocket in subscribers[user_id]:
         task = websocket.send_json(json.dumps(data))
         messages.append(task)
     async with asyncio.TaskGroup() as tg:
