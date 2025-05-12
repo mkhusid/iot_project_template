@@ -29,7 +29,7 @@ async def create_agent_data(data: List[ProcessedAgentDataModel], session: db_ses
 
     try:
         json_data = [pa_data.model_dump_json() for pa_data in data]
-        await socket.send_data(json_data)
+        await socket.send_data(json_data, data[0].agent_data.user_id)
         await session.commit()
         return [{"id": data.id, "timestamp": data.timestamp} for data in processed_agent_data]
 
