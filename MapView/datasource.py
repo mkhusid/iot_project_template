@@ -32,8 +32,7 @@ class DataSource:
                             parsed_data = json.loads(data)
                             self.handle_received_data(parsed_data)
                         except json.JSONDecodeError:
-                            print("Received data is not valid JSON:")
-                            print(data)
+                            Logger.error("Received data is not valid JSON: %s", data)
                 except websockets.exceptions.ConnectionClosedError:
                     self.connection_status = "Disconnected"
                     Logger.debug("SERVER DISCONNECT")
