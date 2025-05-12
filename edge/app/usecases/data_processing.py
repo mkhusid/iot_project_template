@@ -10,9 +10,13 @@ def process_agent_data(
     Parameters:
         agent_data (AgentData): Agent data that containing accelerometer, GPS, and timestamp.
     Returns:
-        processed_data_batch (ProcessedAgentData): Processed data containing the classified state of the road surface and agent data.
+        processed_data_batch (ProcessedAgentData):
+        Processed data containing the classified state of the road surface and agent data.
     """
-    road_state = "good" if 15000 > agent_data.accelerometer.z > 0 \
-        else "bad" if agent_data.accelerometer.z < 17000 or agent_data.accelerometer.z > -1000 \
-        else "very bad"
+    if 0 < agent_data.accelerometer.z < 15000:
+        road_state = "good"
+    elif -1000 < agent_data.accelerometer.z < 17000:
+        road_state = "bump"
+    else:
+        road_state = "pothole"
     return ProcessedAgentData(road_state=road_state, agent_data=agent_data)
