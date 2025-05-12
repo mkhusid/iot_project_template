@@ -1,6 +1,7 @@
 ''' Module for handling data from the server via websockets. '''
 import asyncio
 import json
+from typing import List
 import websockets
 from kivy import Logger
 from config import STORE_HOST, STORE_PORT, USER_ID
@@ -37,7 +38,7 @@ class DataSource:
                     self.connection_status = "Disconnected"
                     Logger.debug("SERVER DISCONNECT")
 
-    def handle_received_data(self, data):
+    def handle_received_data(self, data: List[ProcessedAgentData]):
         ''' Update your UI or perform actions with received data here '''
         parsed_items = [json.loads(item) for item in json.loads(data)]
         Logger.info("Received data: %s", parsed_items)
