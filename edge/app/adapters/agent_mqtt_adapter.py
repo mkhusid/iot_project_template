@@ -50,6 +50,7 @@ class AgentMQTTAdapter(AgentGateway):
             # Process the received data (you can call a use case here if needed)
             processed_data = process_agent_data(agent_data)
             # Store the agent_data in the database (you can send it to the data processing module)
+            logging.info("Processed data: %s \n", processed_data)
 
             if not self.hub_gateway.save_data(processed_data):
                 logging.error("Hub is not available")
