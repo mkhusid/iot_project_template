@@ -1,5 +1,6 @@
-import paho.mqtt.client as mqtt
+''' Store processed agent data. '''
 import time
+import paho.mqtt.client as mqtt
 from schema.aggregated_data_schema import AggregatedDataSchema
 from schema.gps_schema import GpsSchema
 from schema.accelerometer_schema import AccelerometerSchema
@@ -20,7 +21,7 @@ def connect_mqtt(broker, port):
             print("[INFO] Properties: %s", properties)
         else:
             print("Failed to connect {broker}:{port}, return code %d\n", rc)
-            exit(rc)  # Stop execution
+            exit(rc)
 
     client = mqtt.Client()
     client.on_connect = on_connect

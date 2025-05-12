@@ -3,13 +3,13 @@ from kivy.app import App
 from kivy_garden.mapview import MapMarker, MapView
 from kivy.clock import Clock
 from lineMapLayer import LineMapLayer
-from datasource import Datasource
+from datasource import DataSource
 
 
 class MapViewApp(App):
     def __init__(self, **kwargs):
         super().__init__()
-        self.datasource = Datasource()
+        self.datasource = DataSource()
         self.car_marker = None
 
     def on_start(self):
@@ -43,7 +43,8 @@ class MapViewApp(App):
             self.car_marker.detach()
 
         print(point.latitude, point.longitude)
-        self.car_marker = MapMarker(lat=point.latitude, lon=point.longitude, source='images/car.png')
+        self.car_marker = MapMarker(lat=point.latitude,
+                lon=point.longitude, source='images/car.png')
         self.mapview.add_marker(self.car_marker)
         self.mapview.center_on(point.latitude, point.longitude)
 

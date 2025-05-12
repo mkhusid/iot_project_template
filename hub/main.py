@@ -26,7 +26,7 @@ logging.basicConfig(
 
 
 def run_mqtt_hub(client: mqtt.Client = None, redis_client: Redis = None,
-         store_adapter: StoreApiAdapter = None):
+                 store_adapter: StoreApiAdapter = None):
     """Main function to run the MQTT client and publish data in an infinite loop"""
 
     def on_connect(client, userdata, flags, rc):
@@ -55,8 +55,12 @@ def run_mqtt_hub(client: mqtt.Client = None, redis_client: Redis = None,
                         redis_client.lpop("processed_agent_data")
                     )
                     processed_agent_data_batch.append(processed_agent_data)
-            store_adapter.save_data(processed_agent_data_batch=processed_agent_data_batch)
-            return {"status": "ok"}
+            if len(processed_agent_data_batch) > 0:
+                store_adapter.save_data(processed_agent_data_batch=processed_agent_data_batch)
+                return {"status": "ok"}
+
+        except ConnectionError as ce:
+            logging.info("Connection error: %s", ce)
         except Exception as e:
             logging.info("Error processing MQTT message: %s", e)
 
